@@ -3980,11 +3980,28 @@
       $("#drawer-backdrop").onclick = () => openDrawer(false);
       const drawerChatsSection = $(".drawer-chats-sec");
       const drawerChatsToggle = $("#drawer-chats-toggle");
+      const drawerChatsList = $("#drawer-chats-list");
+      function positionDrawerChatsPopover() {
+        if (!document.body.classList.contains("sidebar-persistent") ||
+            document.body.classList.contains("sidebar-expanded")) return;
+        const trigger = drawerChatsToggle.getBoundingClientRect();
+        const maxHeight = Math.min(window.innerHeight * 0.58, 420);
+        const listHeight = Math.min(drawerChatsList.scrollHeight || maxHeight, maxHeight);
+        const top = Math.max(8, Math.min(trigger.top, window.innerHeight - listHeight - 8));
+        drawerChatsList.style.setProperty("--recent-chats-left", `${trigger.right}px`);
+        drawerChatsList.style.setProperty("--recent-chats-top", `${top}px`);
+      }
+      drawerChatsSection.addEventListener("pointerenter", () => requestAnimationFrame(positionDrawerChatsPopover));
+      drawerChatsSection.addEventListener("focusin", () => requestAnimationFrame(positionDrawerChatsPopover));
+      window.addEventListener("resize", positionDrawerChatsPopover, { passive: true });
       drawerChatsToggle.onclick = () => {
         const show = !drawerChatsSection.classList.contains("show");
         drawerChatsSection.classList.toggle("show", show);
         drawerChatsToggle.setAttribute("aria-expanded", String(show));
-        if (show) renderDrawerChats();
+        if (show) {
+          renderDrawerChats();
+          requestAnimationFrame(positionDrawerChatsPopover);
+        }
       };
       document.addEventListener("pointerdown", (event) => {
         if (!document.body.classList.contains("sidebar-persistent") || drawerChatsSection.contains(event.target)) return;

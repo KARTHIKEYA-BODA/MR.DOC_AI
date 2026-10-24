@@ -5949,9 +5949,10 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus
   body.sidebar-persistent .drawer-backdrop { display: none !important; }
   body.sidebar-persistent #app-main { width: calc(100% - 78px); margin-left: 78px; }
   body.sidebar-persistent .drawer-chats-sec #drawer-chats-list {
-    position: absolute;
-    top: 0;
-    left: 100%;
+    position: fixed;
+    top: var(--recent-chats-top, 160px);
+    left: var(--recent-chats-left, 62px);
+    z-index: 1000;
     display: none;
     width: min(270px, calc(100vw - 105px));
     max-height: min(58vh, 420px);
@@ -6312,6 +6313,8 @@ button.family-role-card:hover { transform:translateY(-3px); border-color:#54a7b7
 .health-qr-close { position:absolute; top:12px; right:12px; width:32px; height:32px; border:0; border-radius:50%; background:#edf4f6; color:#31566a; font-size:20px; cursor:pointer; }
 .body-part-labels { position:absolute; inset:0; pointer-events:none; color:#285a70; font-size:clamp(9px, .9vw, 11px); font-weight:750; }
 .body-label-connectors { position:absolute; inset:0; width:100%; height:100%; overflow:visible; color:rgba(45,112,143,.82); }
+.body3d-layer .body-label-connectors { transition: opacity 120ms ease; }
+.body3d-layer.is-rotating .body-label-connectors { opacity: 0; }
 .body-part-labels span { position:absolute; z-index:1; max-width:29%; padding:4px 7px; border:1px solid rgba(91,151,172,.64); border-radius:8px; background:rgba(255,255,255,.92); box-shadow:0 2px 8px rgba(37,83,102,.1); line-height:1.15; overflow-wrap:anywhere; }
 .body-part-labels .label-left::after,.body-part-labels .label-right::after { content:""; position:absolute; top:50%; width:20px; border-top:1px solid rgba(43,119,149,.8); }
 .body-part-labels .label-left::after { left:100%; }

@@ -14,7 +14,7 @@
     viewers.get(canvas)?.dispose();
     let renderer, scene, camera, model, resizeObserver, frameId = 0;
     let three, disposed = false, dragging = false, moved = false;
-    let lastX = 0, fitDistance = 34, pivot, modelBounds;
+    let lastX = 0, fitDistance = 34, pivot, modelBounds, connectorTimer = null;
     const activePointers = new Map();
     let pinchDistance = null;
 
@@ -29,6 +29,8 @@
       dispose() {
         disposed = true;
         if (frameId) cancelAnimationFrame(frameId);
+        if (connectorTimer) clearTimeout(connectorTimer);
+        canvas.parentElement?.classList.remove("is-rotating");
         resizeObserver?.disconnect();
         canvas.removeEventListener("pointerdown", onPointerDown);
         canvas.removeEventListener("pointermove", onPointerMove);
@@ -60,6 +62,17 @@
         updateAnatomyConnectors();
         renderer.render(scene, camera);
       }
+    }
+
+    function hideConnectorsDuringMotion() {
+      const layer = canvas.parentElement;
+      if (!layer) return;
+      layer.classList.add("is-rotating");
+      if (connectorTimer) clearTimeout(connectorTimer);
+      connectorTimer = setTimeout(() => {
+        connectorTimer = null;
+        if (!disposed) layer.classList.remove("is-rotating");
+      }, 280);
     }
 
     function updateAnatomyConnectors() {
@@ -132,6 +145,9 @@
 
     function reset() {
       if (!model || !camera) return;
+      if (connectorTimer) clearTimeout(connectorTimer);
+      connectorTimer = null;
+      canvas.parentElement?.classList.remove("is-rotating");
       pivot.rotation.set(0, 0, 0);
       camera.position.set(0, 0, fitDistance);
       camera.lookAt(0, 0, 0);
@@ -159,7 +175,10 @@
       if (activePointers.has(event.pointerId)) activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       if (activePointers.size > 1) {
         const nextDistance = pointerDistance();
-        if (pinchDistance && nextDistance > 0) zoomBy(pinchDistance / nextDistance);
+        if (pinchDistance && nextDistance > 0) {
+          hideConnectorsDuringMotion();
+          zoomBy(pinchDistance / nextDistance);
+        }
         pinchDistance = nextDistance;
         moved = true;
         render();
@@ -168,6 +187,7 @@
       if (!dragging) return;
       const dx = event.clientX - lastX;
       if (Math.abs(dx) > 2) moved = true;
+      if (dx !== 0) hideConnectorsDuringMotion();
       pivot.rotation.y += dx * 0.009;
       lastX = event.clientX;
       render();
@@ -219,6 +239,7 @@
       else if (event.key === "ArrowUp" || event.key === "ArrowDown") return;
       else if (event.key === "Home") reset();
       else return;
+      hideConnectorsDuringMotion();
       event.preventDefault();
       render();
     }
