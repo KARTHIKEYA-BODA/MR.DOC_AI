@@ -5032,6 +5032,7 @@
       }
       introStart.addEventListener("click", () => {
         if (introAfterAuth) playIntroVideo();
+        else if (cloudAuth) closeIntro(false);
         else showAuth(false);
       });
       $("#auth-back").onclick = () => {
@@ -5194,11 +5195,7 @@
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || "Could not verify your account session.");
           if (!result.authenticated) {
-            if (localStorage.getItem("mrdoc_auth_completed") === "1") {
-              localStorage.removeItem("mrdoc_auth_completed");
-              showAuth(false);
-              authStatus.textContent = "Your session ended. Sign in again to open your health workspace.";
-            } else showAuth(false);
+            localStorage.removeItem("mrdoc_auth_completed");
             return;
           }
           cloudAuth = { user: result.user, csrfToken: result.csrfToken };
@@ -5230,7 +5227,7 @@
           authScreen.hidden = true;
           introVideo.pause();
           introAfterAuth = localStorage.getItem("mrdoc_intro_after_auth") === "1";
-          introScreen.hidden = !introAfterAuth;
+          introScreen.hidden = false;
           document.body.classList.remove("intro-revealing");
           if (introAfterAuth) {
             localStorage.removeItem("mrdoc_intro_after_auth");
@@ -5243,7 +5240,7 @@
             document.body.classList.add("intro-active");
             requestAnimationFrame(() => playIntroVideo());
           } else {
-            document.body.classList.remove("intro-active");
+            document.body.classList.add("intro-active");
           }
           syncSidebarPresentation();
           if (localStorage.getItem("mrdoc_cloud_dirty") === "1") queueAccountSync();
@@ -5254,10 +5251,6 @@
         } catch (error) {
           cloudAuth = null;
           window.mrdocCsrfToken = "";
-          if (localStorage.getItem("mrdoc_auth_completed") === "1") {
-            showAuth(false);
-            authStatus.textContent = `${error.message || "Your account could not be reached."} Your saved workspace has not been opened.`;
-          }
         }
       }
       if (pendingResetToken) showAuth(false);
