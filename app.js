@@ -5298,11 +5298,18 @@
             text: "Start a new chat, open your medical records, or view your health timeline.",
           },
           {
-            sel: ".drawer-profile-bottom",
+            sel: "#drawer-chats-toggle",
             drawer: true,
             place: "right",
+            title: "Recent chats",
+            text: "Hover over this clock or tap it to open your saved conversations. Select a chat to return to it.",
+          },
+          {
+            sel: "#top-my-health-btn",
+            drawer: false,
+            place: "bottom",
             title: "My Health",
-            text: "Your personal health profile, including saved allergies, conditions and medicines.",
+            text: "Open My Health to view your personal profile, or choose My family to switch to a family member’s profile.",
           },
           {
             sel: "#records-dropzone",

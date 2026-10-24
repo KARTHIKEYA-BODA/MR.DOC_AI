@@ -5951,7 +5951,7 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus
   body.sidebar-persistent .drawer-chats-sec #drawer-chats-list {
     position: absolute;
     top: 0;
-    left: calc(100% + 12px);
+    left: 100%;
     display: none;
     width: min(270px, calc(100vw - 105px));
     max-height: min(58vh, 420px);
@@ -5979,7 +5979,9 @@ input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus
   body.sidebar-persistent .drawer-chats-sec:hover .drawer-chats-trigger::after,
   body.sidebar-persistent .drawer-chats-sec.show .drawer-chats-trigger::after { opacity: 0; }
   body.sidebar-persistent .drawer-chats-sec #drawer-chats-list .item { min-width: 0; }
-  body.sidebar-persistent .drawer-chats-sec #drawer-chats-list .chat-select { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.sidebar-persistent .drawer-chats-sec #drawer-chats-list .chat-select { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+  body.sidebar-persistent .drawer-chats-sec #drawer-chats-list .chat-select:hover,
+  body.sidebar-persistent .drawer-chats-sec #drawer-chats-list .chat-select:focus-visible { color: #155b94; background: #f0f6fb; outline: none; }
 }
 @media (max-width: 480px) {
   body.sidebar-persistent .drawer { top: 54px; }
