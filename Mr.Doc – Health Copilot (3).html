@@ -29,13 +29,12 @@
     </script>
     <link rel="stylesheet" href="styles.css?v=post-auth-intro-20261024" />
   </head>
-  <body>
-    <!-- First-time visitors see this video after they sign in or create an account. -->
+  <body class="intro-active">
+    <!-- Welcome page with Get Started; sign-in follows, then the introduction video. -->
     <section
       class="copilot-intro"
       id="copilot-intro"
       aria-label="Meet your AI Copilot"
-      hidden
     >
       <header class="intro-header">
         <div class="intro-brand" aria-label="Mr.Doc AI Copilot">
@@ -118,7 +117,7 @@
       ></p>
     </section>
 
-    <section class="auth-screen" id="auth-screen" aria-labelledby="auth-title">
+    <section class="auth-screen" id="auth-screen" hidden aria-labelledby="auth-title">
       <button class="auth-back" id="auth-back" type="button" aria-label="Return to welcome page" hidden>← Back</button>
       <div class="auth-character" aria-hidden="true"><img src="assets/auth-character/idle.png" alt=""></div>
       <div class="auth-card">

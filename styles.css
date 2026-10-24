@@ -5460,7 +5460,7 @@ body.stage-3d #stage .bubble { z-index: 5; }
   .mrdoc3d { transition: none; }
 }
 
-/* Account screen shown before the first-time introduction video. */
+/* Account screen shown between the welcome page and introduction video. */
 .auth-screen {
   position: fixed;
   inset: 0;
