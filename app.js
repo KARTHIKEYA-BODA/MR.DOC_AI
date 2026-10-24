@@ -4754,6 +4754,7 @@
         pendingTour = false,
         authAfterTutorial = false,
         authHomeAfterSubmit = false,
+        introAfterAuth = false,
         introTimer;
       introSkip.hidden = true;
       introVideo.controls = false;
@@ -4795,6 +4796,7 @@
           return;
         }
         introClosed = true;
+        introAfterAuth = false;
         clearTimeout(introTimer);
         introVideo.pause();
         document.body.classList.remove("intro-active");
@@ -4819,6 +4821,16 @@
         clearTimeout(introTimer);
         introVideo.pause();
         introScreen.classList.remove("is-playing");
+        if (introAfterAuth) {
+          introScreen.classList.add("has-error");
+          introStart.disabled = false;
+          introStartLabel.textContent = "PLAY INTRO";
+          introStatus.textContent =
+            "The introduction could not start. Try playing it again or continue to Mr.Doc.";
+          introSkip.hidden = false;
+          introSkip.textContent = "Continue to Mr.Doc";
+          return;
+        }
         if (introRequested) {
           notify(
             "The intro video could not play. Mr.Doc is ready to use.",
@@ -4839,6 +4851,7 @@
         authScreen.hidden = false;
         syncSidebarPresentation();
         const welcomeIsVisible = introScreen.isConnected && !introScreen.hidden;
+        $("#auth-back").hidden = !welcomeIsVisible && !authAfterTutorial;
         if (welcomeIsVisible) introScreen.classList.add("auth-transitioning");
         authScreen.classList.remove("is-entering");
         void authScreen.offsetWidth;
@@ -5002,6 +5015,7 @@
         introRequested = true;
         clearCharacterTraveler();
         authScreen.hidden = true;
+        introScreen.hidden = false;
         introScreen.classList.remove("has-error");
         introStatus.textContent = "";
         introScreen.classList.add("is-playing");
@@ -5016,7 +5030,10 @@
           introFailure();
         }
       }
-      introStart.addEventListener("click", () => showAuth(false));
+      introStart.addEventListener("click", () => {
+        if (introAfterAuth) playIntroVideo();
+        else showAuth(false);
+      });
       $("#auth-back").onclick = () => {
         const returnToWelcome = introScreen.isConnected &&
           (!introScreen.hidden || authAfterTutorial);
@@ -5101,6 +5118,7 @@
           localStorage.setItem("mrdoc_auth_email", result.user.email);
           localStorage.setItem("mrdoc_auth_username", result.user.username);
           localStorage.setItem("mrdoc_auth_completed", "1");
+          localStorage.setItem("mrdoc_intro_after_auth", "1");
           localStorage.setItem("mrdoc_tour_after_auth", authAfterTutorial ? "1" : "0");
           localStorage.setItem("mrdoc_cloud_dirty", "0");
           if (workspace.updatedAt) localStorage.setItem("mrdoc_cloud_updated_at", workspace.updatedAt);
@@ -5180,7 +5198,7 @@
               localStorage.removeItem("mrdoc_auth_completed");
               showAuth(false);
               authStatus.textContent = "Your session ended. Sign in again to open your health workspace.";
-            }
+            } else showAuth(false);
             return;
           }
           cloudAuth = { user: result.user, csrfToken: result.csrfToken };
@@ -5209,10 +5227,24 @@
           localStorage.setItem("mrdoc_auth_email", result.user.email);
           localStorage.setItem("mrdoc_auth_username", result.user.username);
           localStorage.setItem("mrdoc_auth_completed", "1");
-          introScreen.hidden = true;
           authScreen.hidden = true;
           introVideo.pause();
-          document.body.classList.remove("intro-active", "intro-revealing");
+          introAfterAuth = localStorage.getItem("mrdoc_intro_after_auth") === "1";
+          introScreen.hidden = !introAfterAuth;
+          document.body.classList.remove("intro-revealing");
+          if (introAfterAuth) {
+            localStorage.removeItem("mrdoc_intro_after_auth");
+            introClosed = false;
+            introRequested = false;
+            introStart.disabled = false;
+            introStartLabel.textContent = "PLAY INTRO";
+            introSkip.hidden = false;
+            introSkip.textContent = "Continue to Mr.Doc";
+            document.body.classList.add("intro-active");
+            requestAnimationFrame(() => playIntroVideo());
+          } else {
+            document.body.classList.remove("intro-active");
+          }
           syncSidebarPresentation();
           if (localStorage.getItem("mrdoc_cloud_dirty") === "1") queueAccountSync();
           if (localStorage.getItem("mrdoc_tour_after_auth") === "1") {
@@ -5231,7 +5263,6 @@
       if (pendingResetToken) showAuth(false);
       else restoreAccountSession();
 
-      document.body.classList.add("intro-active");
       syncSidebarPresentation();
 
 
